@@ -30,7 +30,7 @@ func  VerifyData(c *gin.Context) {
 	log.Println(nonce)
 	log.Println(timestamp)
 	log.Println(echostr)
-	c.JSON(http.StatusOK,echostr)
+	c.String(http.StatusOK,echostr)
 	return
 	//if checkSignature(wechatToken, signature, timestamp, nonce) {
 	//	c.JSON(http.StatusOK,echostr)
