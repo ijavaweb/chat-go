@@ -6,6 +6,7 @@ import (
 	"context"
 	"crypto/sha1"
 	"encoding/hex"
+	"encoding/xml"
 	"github.com/gin-gonic/gin"
 	"github.com/go-xmlpath/xmlpath"
 	"log"
@@ -52,7 +53,18 @@ func MessageHandler (c *gin.Context) {
 
 	select {
 	case <-ctx.Done():
-		c.String(http.StatusOK,"success")
+		response := model.TextMessage{
+			ToUserName:   receivedMessage.FromUserName,
+			FromUserName: receivedMessage.ToUserName,
+			CreateTime:   time.Now().Unix(),
+			MsgType:      receivedMessage.MsgType,
+			Content:      "问题似乎有点复杂，我超时了~",
+		}
+		msg, err := xml.Marshal(&response)
+		if err != nil {
+			return
+		}
+		_, _ = c.Writer.Write(msg)
 		return
 	default:
 		go service.GenerateGPTResponse(c,&receivedMessage)
