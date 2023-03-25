@@ -11,7 +11,6 @@ import (
 	"net/http"
 	"sort"
 	"strings"
-	"time"
 )
 
 const (
@@ -47,8 +46,6 @@ func MessageHandler (c *gin.Context) {
 	}
 
 	go service.GenerateGPTResponse(c,&receivedMessage)
-
-	<- time.After(4 * time.Second)
 	c.String(http.StatusOK,"success")
 }
 func checkSignature(token, signature, timestamp, nonce string) bool {
