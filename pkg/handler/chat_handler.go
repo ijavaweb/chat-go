@@ -5,19 +5,16 @@ import (
 	"blog-go/pkg/service"
 	"crypto/sha1"
 	"encoding/hex"
-	"encoding/xml"
 	"github.com/gin-gonic/gin"
 	"github.com/go-xmlpath/xmlpath"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"sort"
 	"strings"
-	"time"
 )
 
 const (
-	wechatToken     = "67_O1jpy-zALM2xFGr2LrsBrC7Z9BfqAr0svomeGa-FILrVXsqltmSifOui56rKHjHDmIa-JWEqKkVaVIY6orJOlfCpozNPvFZgmG56VGZgqI5I9lVlO3DnLYBfhbsWVBaAHAAZF"
+	wechatToken     = "67_cLACSYnbUDKi0lCk_PKk8CidfO5RonJeLWWStL7cI5-_VE4e-bATO-oinkJSWUM4b6W1rQWumCIyfJAfH8s8UVcGcYzvjqNBNh_DY5qRxhfrvpFzf6qUgfAXZR4CDWcAHALM"
 )
 func  VerifyData(c *gin.Context) {
 	req := c.Request
@@ -40,32 +37,14 @@ func  VerifyData(c *gin.Context) {
 	//}
 }
 func MessageHandler (c *gin.Context) {
-	req := c.Request
-	body, err := ioutil.ReadAll(req.Body)
-	defer req.Body.Close()
-
+	var receivedMessage model.TextMessage
+	err:=c.ShouldBindXML(&receivedMessage)
 	if err != nil {
-		c.JSON(http.StatusBadRequest,err.Error())
+		c.String(http.StatusBadRequest, "Invalid XML")
 		return
 	}
-
-	content, toUserName := parseXMLMessage(string(body))
-
-	reply := service.GenerateGPTResponse(content)
-	response := model.TextMessage{
-		ToUserName:   toUserName,
-		FromUserName: "gh_a835fe2e54c7",
-		CreateTime:   time.Now().Unix(),
-		MsgType:      "text",
-		Content:       reply,
-	}
-
-	responseXML, err := xml.MarshalIndent(response, "", "  ")
-	if err != nil {
-		c.JSON(http.StatusOK,err.Error())
-		return
-	}
-	c.XML(http.StatusOK,responseXML)
+	go service.GenerateGPTResponse(c,&receivedMessage)
+	return
 }
 func checkSignature(token, signature, timestamp, nonce string) bool {
 	values := []string{token, timestamp, nonce}

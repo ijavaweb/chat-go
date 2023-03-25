@@ -5,18 +5,19 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/gin-gonic/gin"
 	"io/ioutil"
 	"net/http"
 	"strings"
+	"time"
 )
 
-func GenerateGPTResponse(prompt string) string {
-	fmt.Print(prompt)
+func GenerateGPTResponse(c *gin.Context,receivedMessage *model.TextMessage)  {
 	apiURL := "https://api.openai.com/v1/chat/completions"
 	messages := make([]model.Message,0)
 	messages = append(messages,model.Message{
 		Role:    "user",
-		Content: prompt,
+		Content: receivedMessage.Content,
 	})
 	data := &model.OpenAIRequest{
 		Model:    "gpt-3.5-turbo",
@@ -24,13 +25,13 @@ func GenerateGPTResponse(prompt string) string {
 	}
 	jsonData, err := json.Marshal(data)
 	if err != nil {
-		return "Error generating response"
+		return
 	}
 
 	client := &http.Client{}
 	req, err := http.NewRequest("POST", apiURL, bytes.NewBuffer(jsonData))
 	if err != nil {
-		return "Error generating response"
+		return
 	}
 
 	req.Header.Set("Content-Type", "application/json")
@@ -38,20 +39,27 @@ func GenerateGPTResponse(prompt string) string {
 
 	resp, err := client.Do(req)
 	if err != nil {
-		return "Error generating response"
+		return
 	}
 	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return "Error generating response"
+		return
 	}
-
-	fmt.Println(string(body))
 	var result model.OpenAIResponse
 	err = json.Unmarshal(body, &result)
 	if err != nil {
-		return "Error generating response"
+		return
 	}
-	return strings.TrimSpace(result.Choices[0].Message.Content)
+	reply := strings.TrimSpace(result.Choices[0].Message.Content)
+	response := model.TextMessage{
+		ToUserName:   receivedMessage.ToUserName,
+		FromUserName: receivedMessage.FromUserName,
+		CreateTime:   time.Now().Unix(),
+		MsgType:      receivedMessage.MsgType,
+		Content:       reply,
+	}
+	c.XML(http.StatusOK,response)
+	return
 }

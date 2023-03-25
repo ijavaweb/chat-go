@@ -22,6 +22,7 @@
     <list default="true" id="b17f8310-b427-427d-b10f-8df1a813d69c" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pkg/handler/chat_handler.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/handler/chat_handler.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/service/chat_service.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/service/chat_service.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -66,5 +67,16 @@
   </component>
   <component name="VgoProject">
     <integration-enabled>true</integration-enabled>
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/pkg/logger/logger.go</url>
+          <line>43</line>
+          <option name="timeStamp" value="2" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>
