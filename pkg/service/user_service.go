@@ -23,9 +23,11 @@ func DeleteUser(user *model.UserInfo) error  {
 func CreateWechatUser(username string)  {
 	u, err := db.GetUser(username)
 	if err != nil {
+		log.Println(err.Error())
 		return
 	}
 	if u != nil {
+		log.Println("user is not empty")
 		return
 	}
 	user := &model.UserInfo{
