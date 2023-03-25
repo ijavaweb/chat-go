@@ -3,6 +3,7 @@ package handler
 import (
 	"blog-go/pkg/model"
 	"blog-go/pkg/service"
+	"context"
 	"crypto/sha1"
 	"encoding/hex"
 	"github.com/gin-gonic/gin"
@@ -11,6 +12,7 @@ import (
 	"net/http"
 	"sort"
 	"strings"
+	"time"
 )
 
 const (
@@ -44,9 +46,19 @@ func MessageHandler (c *gin.Context) {
 		c.String(http.StatusBadRequest, "Invalid XML")
 		return
 	}
+	ctx, cancel := context.WithTimeout(c.Request.Context(), 4500*time.Millisecond)
+	defer cancel()
+	c.Request = c.Request.WithContext(ctx)
 
-	go service.GenerateGPTResponse(c,&receivedMessage)
-	c.String(http.StatusOK,"success")
+	select {
+	case <-ctx.Done():
+		c.String(http.StatusOK,"success")
+		return
+	default:
+		go service.GenerateGPTResponse(c,&receivedMessage)
+		return
+	}
+
 }
 func checkSignature(token, signature, timestamp, nonce string) bool {
 	values := []string{token, timestamp, nonce}
