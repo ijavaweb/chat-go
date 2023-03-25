@@ -9,6 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-xmlpath/xmlpath"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"sort"
 	"strings"
@@ -24,13 +25,19 @@ func  VerifyData(c *gin.Context) {
 	timestamp := req.URL.Query().Get("timestamp")
 	nonce := req.URL.Query().Get("nonce")
 	echostr := req.URL.Query().Get("echostr")
-
-	if checkSignature(wechatToken, signature, timestamp, nonce) {
-		c.JSON(http.StatusOK,echostr)
-		return
-	} else {
-		c.JSON(http.StatusOK,"invalid signature")
-	}
+	log.Println(req)
+	log.Println(signature)
+	log.Println(nonce)
+	log.Println(timestamp)
+	log.Println(echostr)
+	c.JSON(http.StatusOK,echostr)
+	return
+	//if checkSignature(wechatToken, signature, timestamp, nonce) {
+	//	c.JSON(http.StatusOK,echostr)
+	//	return
+	//} else {
+	//	c.JSON(http.StatusOK,"invalid signature")
+	//}
 }
 func MessageHandler (c *gin.Context) {
 	req := c.Request

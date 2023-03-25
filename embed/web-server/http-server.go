@@ -22,8 +22,8 @@ func StartWebServer() {
 }
 func Register(engine *gin.Engine)  {
 	chat:=engine.Group("/chat")
-	chat.GET("/process",handler.VerifyData)
-	chat.POST("/process",handler.MessageHandler)
+	chat.GET("/process",logger.Log(handler.VerifyData))
+	chat.POST("/process",logger.Log(handler.MessageHandler))
 
 }
 func Cors() gin.HandlerFunc {
