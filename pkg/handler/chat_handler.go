@@ -39,7 +39,7 @@ func  VerifyData(c *gin.Context) {
 	//}
 }
 func MessageHandler (c *gin.Context) {
-	timeout := time.After(4000 * time.Millisecond)
+	timeout := time.After(3500 * time.Millisecond)
 	var receivedMessage model.TextMessage
 	err := c.ShouldBindXML(&receivedMessage)
 	if err != nil {
@@ -63,7 +63,7 @@ func MessageHandler (c *gin.Context) {
 		_, _ = c.Writer.Write(msg)
 		return
 	default:
-		service.GenerateGPTResponse(c,&receivedMessage)
+		go service.GenerateGPTResponse(c,&receivedMessage)
 	}
 }
 func checkSignature(token, signature, timestamp, nonce string) bool {
