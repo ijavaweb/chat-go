@@ -39,6 +39,7 @@ func  VerifyData(c *gin.Context) {
 	//}
 }
 func MessageHandler (c *gin.Context) {
+	timeout := time.After(4000 * time.Millisecond)
 	var receivedMessage model.TextMessage
 	err := c.ShouldBindXML(&receivedMessage)
 	if err != nil {
@@ -46,20 +47,24 @@ func MessageHandler (c *gin.Context) {
 		c.String(http.StatusBadRequest, "Invalid XML")
 		return
 	}
-	go service.GenerateGPTResponse(c,&receivedMessage)
-	 <- time.After(4000 * time.Millisecond)
-	response := model.TextMessage{
-		ToUserName:   receivedMessage.FromUserName,
-		FromUserName: receivedMessage.ToUserName,
-		CreateTime:   time.Now().Unix(),
-		MsgType:      receivedMessage.MsgType,
-		Content:      "问题似乎太复杂了，我超时了~",
-	}
-	msg, err := xml.Marshal(&response)
-	if err != nil {
+	select {
+	case <- timeout:
+		response := model.TextMessage{
+			ToUserName:   receivedMessage.FromUserName,
+			FromUserName: receivedMessage.ToUserName,
+			CreateTime:   time.Now().Unix(),
+			MsgType:      receivedMessage.MsgType,
+			Content:      "问题似乎太复杂了，我超时了~",
+		}
+		msg, err := xml.Marshal(&response)
+		if err != nil {
+			return
+		}
+		_, _ = c.Writer.Write(msg)
 		return
+	default:
+		service.GenerateGPTResponse(c,&receivedMessage)
 	}
-	_, _ = c.Writer.Write(msg)
 }
 func checkSignature(token, signature, timestamp, nonce string) bool {
 	values := []string{token, timestamp, nonce}
