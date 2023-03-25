@@ -49,8 +49,6 @@ func MessageHandler (c *gin.Context) {
 	}
 	ctx, cancel := context.WithTimeout(c.Request.Context(), 4500*time.Millisecond)
 	defer cancel()
-	c.Request = c.Request.WithContext(ctx)
-
 	select {
 	case <-ctx.Done():
 		response := model.TextMessage{
@@ -68,7 +66,6 @@ func MessageHandler (c *gin.Context) {
 		return
 	default:
 		go service.GenerateGPTResponse(c,&receivedMessage)
-		return
 	}
 
 }
