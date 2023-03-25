@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"sort"
 	"strings"
+	"time"
 )
 
 const (
@@ -40,10 +41,13 @@ func MessageHandler (c *gin.Context) {
 	var receivedMessage model.TextMessage
 	err:=c.ShouldBindXML(&receivedMessage)
 	if err != nil {
+		log.Println(err.Error())
 		c.String(http.StatusBadRequest, "Invalid XML")
 		return
 	}
 	go service.GenerateGPTResponse(c,&receivedMessage)
+	<- time.After(4 * time.Second)
+	c.String(200,"success")
 	return
 }
 func checkSignature(token, signature, timestamp, nonce string) bool {

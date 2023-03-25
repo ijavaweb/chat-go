@@ -4,15 +4,19 @@ import (
 	"blog-go/pkg/model"
 	"bytes"
 	"encoding/json"
+	"encoding/xml"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"io/ioutil"
+	"log"
 	"net/http"
+	"os"
 	"strings"
 	"time"
 )
 
 func GenerateGPTResponse(c *gin.Context,receivedMessage *model.TextMessage)  {
+	start := time.Now().Unix()
 	apiURL := "https://api.openai.com/v1/chat/completions"
 	messages := make([]model.Message,0)
 	messages = append(messages,model.Message{
@@ -27,7 +31,11 @@ func GenerateGPTResponse(c *gin.Context,receivedMessage *model.TextMessage)  {
 	if err != nil {
 		return
 	}
-
+	secret := os.Getenv("OPENAI_API_KEY")
+	if secret == "" {
+		log.Println(" empty secret")
+		return
+	}
 	client := &http.Client{}
 	req, err := http.NewRequest("POST", apiURL, bytes.NewBuffer(jsonData))
 	if err != nil {
@@ -35,23 +43,31 @@ func GenerateGPTResponse(c *gin.Context,receivedMessage *model.TextMessage)  {
 	}
 
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", model.OpenAIAPIClient))
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", secret))
 
 	resp, err := client.Do(req)
 	if err != nil {
+		log.Println(err.Error())
 		return
 	}
+	end := time.Now().Unix()
+	log.Printf("time cost : %s ",end-start)
+	log.Println()
+	log.Println()
 	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
+		log.Println(err.Error())
 		return
 	}
 	var result model.OpenAIResponse
 	err = json.Unmarshal(body, &result)
 	if err != nil {
+		log.Println(err.Error())
 		return
 	}
+	log.Println(result)
 	reply := strings.TrimSpace(result.Choices[0].Message.Content)
 	response := model.TextMessage{
 		ToUserName:   receivedMessage.ToUserName,
@@ -60,6 +76,10 @@ func GenerateGPTResponse(c *gin.Context,receivedMessage *model.TextMessage)  {
 		MsgType:      receivedMessage.MsgType,
 		Content:       reply,
 	}
-	c.XML(http.StatusOK,response)
+	msg, err := xml.Marshal(&response)
+	if err != nil {
+		return
+	}
+	_, _ = c.Writer.Write(msg)
 	return
 }

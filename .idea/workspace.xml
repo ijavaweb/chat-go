@@ -21,6 +21,7 @@
   <component name="ChangeListManager">
     <list default="true" id="b17f8310-b427-427d-b10f-8df1a813d69c" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/main" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/main" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pkg/handler/chat_handler.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/handler/chat_handler.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pkg/service/chat_service.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/service/chat_service.go" afterDir="false" />
     </list>
@@ -47,7 +48,7 @@
     <property name="go.import.settings.migrated" value="true" />
     <property name="go.sdk.automatically.set" value="true" />
     <property name="go.tried.to.enable.integration.vgo.integrator" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../blog-go" />
     <property name="vue.rearranger.settings.migration" value="true" />
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
@@ -67,6 +68,12 @@
   </component>
   <component name="VgoProject">
     <integration-enabled>true</integration-enabled>
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="954" y="334" key="FileChooserDialogImpl" timestamp="1679721244047">
+      <screen x="0" y="0" width="2560" height="1400" />
+    </state>
+    <state x="954" y="334" key="FileChooserDialogImpl/0.0.2560.1400@0.0.2560.1400" timestamp="1679721244047" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
