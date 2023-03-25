@@ -26,7 +26,8 @@ func CreateWechatUser(username string)  {
 		log.Println(err.Error())
 		return
 	}
-	if u != nil {
+	if len(u.UserName) >0 {
+		log.Println(u)
 		log.Println("user is not empty")
 		return
 	}
