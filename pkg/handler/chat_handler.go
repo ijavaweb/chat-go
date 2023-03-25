@@ -3,7 +3,6 @@ package handler
 import (
 	"blog-go/pkg/model"
 	"blog-go/pkg/service"
-	"context"
 	"crypto/sha1"
 	"encoding/hex"
 	"encoding/xml"
@@ -47,27 +46,20 @@ func MessageHandler (c *gin.Context) {
 		c.String(http.StatusBadRequest, "Invalid XML")
 		return
 	}
-	ctx, cancel := context.WithTimeout(c.Request.Context(), 4500*time.Millisecond)
-	defer cancel()
-	select {
-	case <-ctx.Done():
-		response := model.TextMessage{
-			ToUserName:   receivedMessage.FromUserName,
-			FromUserName: receivedMessage.ToUserName,
-			CreateTime:   time.Now().Unix(),
-			MsgType:      receivedMessage.MsgType,
-			Content:      "问题似乎有点复杂，我超时了~",
-		}
-		msg, err := xml.Marshal(&response)
-		if err != nil {
-			return
-		}
-		_, _ = c.Writer.Write(msg)
-		return
-	default:
-		go service.GenerateGPTResponse(c,&receivedMessage)
+	go service.GenerateGPTResponse(c,&receivedMessage)
+	 <- time.After(4000 * time.Millisecond)
+	response := model.TextMessage{
+		ToUserName:   receivedMessage.FromUserName,
+		FromUserName: receivedMessage.ToUserName,
+		CreateTime:   time.Now().Unix(),
+		MsgType:      receivedMessage.MsgType,
+		Content:      "问题似乎太复杂了，我超时了~",
 	}
-
+	msg, err := xml.Marshal(&response)
+	if err != nil {
+		return
+	}
+	_, _ = c.Writer.Write(msg)
 }
 func checkSignature(token, signature, timestamp, nonce string) bool {
 	values := []string{token, timestamp, nonce}
