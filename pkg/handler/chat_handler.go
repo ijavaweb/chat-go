@@ -16,7 +16,7 @@ import (
 )
 
 const (
-	wechatToken     = "67_0sfguUnDaeQxKVC-ja-JHl64ses0ZF_6tyvf9Pd-kq0_FSF_O0Zo2xmNZY8C-WnzydWVjnDD4j9eOu_Ep6X0PKjFxdVa8hlKBrHgyTnio8hiKZq287k4B_tBx-cQJGdABAEXU"
+	wechatToken     = "67_O1jpy-zALM2xFGr2LrsBrC7Z9BfqAr0svomeGa-FILrVXsqltmSifOui56rKHjHDmIa-JWEqKkVaVIY6orJOlfCpozNPvFZgmG56VGZgqI5I9lVlO3DnLYBfhbsWVBaAHAAZF"
 )
 func  VerifyData(c *gin.Context) {
 	req := c.Request
