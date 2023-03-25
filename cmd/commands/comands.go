@@ -3,6 +3,7 @@ package commands
 import (
 	webserver "blog-go/embed/web-server"
 	"blog-go/pkg/cmdroot"
+	"blog-go/pkg/db"
 	"github.com/spf13/cobra"
 )
 func Execute() {
@@ -19,7 +20,7 @@ func newServe() *cobra.Command {
 	return serverCmd
 }
 func startServer(cmd *cobra.Command, args []string) error {
-	//db.InitMySQL()
+	db.InitMySQL()
 	cmd.Println("Server starting ...")
 	webserver.StartWebServer()
 	cmdroot.WaitSignal()

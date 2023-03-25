@@ -1,6 +1,7 @@
 package service
 
 import (
+	"blog-go/pkg/db"
 	"blog-go/pkg/model"
 	"bytes"
 	"encoding/json"
@@ -73,6 +74,13 @@ func GenerateGPTResponse(c *gin.Context,receivedMessage *model.TextMessage)  {
 		return
 	}
 	reply := strings.TrimSpace(result.Choices[0].Message.Content)
+	chatLog := &model.ChatLog{
+		Who:   receivedMessage.FromUserName,
+		Query: receivedMessage.Content,
+		Reply: reply,
+		Ctime: time.Now().Unix(),
+	}
+	go db.CreateChatLog(chatLog)
 	response := model.TextMessage{
 		ToUserName:   receivedMessage.FromUserName,
 		FromUserName: receivedMessage.ToUserName,
