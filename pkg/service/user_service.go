@@ -29,7 +29,6 @@ func CreateWechatUser(username string)  {
 		return
 	}
 	user := &model.UserInfo{
-		Id:       0,
 		UserName: username,
 		Password: "",
 		Role:     "wechat",

@@ -81,6 +81,8 @@ func GenerateGPTResponse(c *gin.Context,receivedMessage *model.TextMessage)  {
 		Ctime: time.Now().Unix(),
 	}
 	go db.CreateChatLog(chatLog)
+	go CreateWechatUser(receivedMessage.FromUserName)
+
 	response := model.TextMessage{
 		ToUserName:   receivedMessage.FromUserName,
 		FromUserName: receivedMessage.ToUserName,

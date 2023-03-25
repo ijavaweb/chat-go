@@ -47,7 +47,6 @@ func MessageHandler (c *gin.Context) {
 	}
 
 	go service.GenerateGPTResponse(c,&receivedMessage)
-	go service.CreateWechatUser(receivedMessage.FromUserName)
 
 	<- time.After(4 * time.Second)
 	c.String(http.StatusOK,"success")
