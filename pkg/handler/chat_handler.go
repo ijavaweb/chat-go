@@ -5,7 +5,6 @@ import (
 	"blog-go/pkg/service"
 	"crypto/sha1"
 	"encoding/hex"
-	"encoding/xml"
 	"github.com/gin-gonic/gin"
 	"github.com/go-xmlpath/xmlpath"
 	"log"
@@ -39,7 +38,6 @@ func  VerifyData(c *gin.Context) {
 	//}
 }
 func MessageHandler (c *gin.Context) {
-	timeout := time.After(3500 * time.Millisecond)
 	var receivedMessage model.TextMessage
 	err := c.ShouldBindXML(&receivedMessage)
 	if err != nil {
@@ -47,24 +45,9 @@ func MessageHandler (c *gin.Context) {
 		c.String(http.StatusBadRequest, "Invalid XML")
 		return
 	}
-	select {
-	case <- timeout:
-		response := model.TextMessage{
-			ToUserName:   receivedMessage.FromUserName,
-			FromUserName: receivedMessage.ToUserName,
-			CreateTime:   time.Now().Unix(),
-			MsgType:      receivedMessage.MsgType,
-			Content:      "问题似乎太复杂了，我超时了~",
-		}
-		msg, err := xml.Marshal(&response)
-		if err != nil {
-			return
-		}
-		_, _ = c.Writer.Write(msg)
-		return
-	default:
-		go service.GenerateGPTResponse(c,&receivedMessage)
-	}
+	go service.GenerateGPTResponse(c,&receivedMessage)
+	<-time.After(4000 * time.Millisecond)
+	c.String(http.StatusOK,"")
 }
 func checkSignature(token, signature, timestamp, nonce string) bool {
 	values := []string{token, timestamp, nonce}
