@@ -39,16 +39,16 @@ func  VerifyData(c *gin.Context) {
 }
 func MessageHandler (c *gin.Context) {
 	var receivedMessage model.TextMessage
-	err:=c.ShouldBindXML(&receivedMessage)
+	err := c.ShouldBindXML(&receivedMessage)
 	if err != nil {
 		log.Println(err.Error())
 		c.String(http.StatusBadRequest, "Invalid XML")
 		return
 	}
+
 	go service.GenerateGPTResponse(c,&receivedMessage)
 	<- time.After(4 * time.Second)
-	c.String(200,"success")
-	return
+	c.String(http.StatusOK,"success")
 }
 func checkSignature(token, signature, timestamp, nonce string) bool {
 	values := []string{token, timestamp, nonce}

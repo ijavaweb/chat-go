@@ -16,6 +16,7 @@ import (
 )
 
 func GenerateGPTResponse(c *gin.Context,receivedMessage *model.TextMessage)  {
+	log.Println(*receivedMessage)
 	start := time.Now().Unix()
 	apiURL := "https://api.openai.com/v1/chat/completions"
 	messages := make([]model.Message,0)
@@ -31,17 +32,17 @@ func GenerateGPTResponse(c *gin.Context,receivedMessage *model.TextMessage)  {
 	if err != nil {
 		return
 	}
-	secret := os.Getenv("OPENAI_API_KEY")
-	if secret == "" {
-		log.Println(" empty secret")
-		return
-	}
+
 	client := &http.Client{}
 	req, err := http.NewRequest("POST", apiURL, bytes.NewBuffer(jsonData))
 	if err != nil {
 		return
 	}
-
+	secret := os.Getenv("OPENAI_API_KEY")
+	if secret == "" {
+		log.Println(" empty secret")
+		return
+	}
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", secret))
 
@@ -51,7 +52,7 @@ func GenerateGPTResponse(c *gin.Context,receivedMessage *model.TextMessage)  {
 		return
 	}
 	end := time.Now().Unix()
-	log.Printf("time cost : %s ",end-start)
+	log.Printf("time cost : %v",end-start)
 	log.Println()
 	log.Println()
 	defer resp.Body.Close()
@@ -63,18 +64,21 @@ func GenerateGPTResponse(c *gin.Context,receivedMessage *model.TextMessage)  {
 	}
 	var result model.OpenAIResponse
 	err = json.Unmarshal(body, &result)
+	log.Println(result)
 	if err != nil {
 		log.Println(err.Error())
 		return
 	}
-	log.Println(result)
+	if len(result.Choices) == 0 {
+		return
+	}
 	reply := strings.TrimSpace(result.Choices[0].Message.Content)
 	response := model.TextMessage{
-		ToUserName:   receivedMessage.ToUserName,
-		FromUserName: receivedMessage.FromUserName,
+		ToUserName:   receivedMessage.FromUserName,
+		FromUserName: receivedMessage.ToUserName,
 		CreateTime:   time.Now().Unix(),
 		MsgType:      receivedMessage.MsgType,
-		Content:       reply,
+		Content:      reply,
 	}
 	msg, err := xml.Marshal(&response)
 	if err != nil {
